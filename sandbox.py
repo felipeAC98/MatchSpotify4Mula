@@ -1,11 +1,11 @@
 import requests
 
 url="https://api.spotify.com/v1/audio-features/"
-access_token='BQC0Hjc2MR1HzX5h-fMzyeh5FJGofHi4I2ek7w_K4UfLDBDl9a6lD1U9PjX16qA18HbbS1GuLCBq_lrCc2fz14QxFgPmylPiLFhYcTY8hgBXYOUnViTMx1HNWIvxoQKOrBd5KvIdG49ypaxntXW6ud8pGcM'
+access_token='BQBTuBansNMF8sitjnFsCf_zYhMiToX9Aq0rNKwHA0UfQ4SPQlLAL4vKH5PA8ypH9wbwLbP75yv2-slJpH_Hjoo5pdbNuWNnxx9SuZqcCG_0DVisJqGcT_nscUmCgc-a_VYhUUk0Drr6cIBc8coJORroJxI'
 header={
 	'Authorization': 'Bearer {token}'.format(token=access_token)
 }
-id='6i0V12jOa3mr6uu4WYhUBr'
+id='4JpKVNYnVcJ8tuMKjAj50A'
 
 response = requests.get(url=url+id,headers=header )
 
