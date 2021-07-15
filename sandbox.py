@@ -1,19 +1,18 @@
-import requests
+import spotifyAPIConection
 
-url="https://api.spotify.com/v1/audio-features/"
-access_token='BQBTuBansNMF8sitjnFsCf_zYhMiToX9Aq0rNKwHA0UfQ4SPQlLAL4vKH5PA8ypH9wbwLbP75yv2-slJpH_Hjoo5pdbNuWNnxx9SuZqcCG_0DVisJqGcT_nscUmCgc-a_VYhUUk0Drr6cIBc8coJORroJxI'
-header={
-	'Authorization': 'Bearer {token}'.format(token=access_token)
-}
+access_token='BQBmJm6yFq-uWfSkBHQmgcEhM-GQkdmaeGL29lyBOo143QPVWW9OW8sSK7md0BXxH7CtUdYEYkpw1R2Zda-01CFb4OHFGSfWtPCQobVLHmrDjVNAwtgfLJrY7yieCZUyAXVUfkcE4623OFb1D405wTu4HSg'
+conexaoSpotify=spotifyAPIConection.spotifyAPIConection(access_token)
+
+session="audio-features/"
 id='4JpKVNYnVcJ8tuMKjAj50A'
 
-response = requests.get(url=url+id,headers=header )
+artistName='Nicki Minaj'
+trackName='Good Form'
 
-print(response)
+response, respJson=conexaoSpotify.trackSearch(trackName,artistName)
 
-respJson=response.json()
+for item in respJson['tracks']['items'] :
+	print(item['name'])
+	print(item['id'])
 
-print(respJson)
-
-for item in respJson:
-	print(respJson[item])
+	print('\n')
