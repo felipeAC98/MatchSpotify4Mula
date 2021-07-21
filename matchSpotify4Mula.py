@@ -1,28 +1,49 @@
+import csv
+
 #carregando dados 4mula
 import pandas as pd
 df = pd.read_parquet('4mula_metadata.parquet')
+#removendo letra da musica
+df.drop(['music_lyrics'], axis=1,inplace=True)
 
 #conectando a API
 import spotifyAPIConection
+import clientToken
 
-access_token='BQCELmVlfPoBgVn5cgT8tOOJzR3uznWawKrY8Oi5qNqdng1NWGzVPYP56njzdkwu34PHWxIYZAE-HooTDHzsBHvVNwoO0KjYvb4DPcw3YZ8QgmQAgCz3fDx_b1XGGWW6qmoVIrVuP_0sqIaR9v494XC_Sq8'
-conexaoSpotify=spotifyAPIConection.spotifyAPIConection(access_token)
+spotifyConnection=spotifyAPIConection.spotifyAPIConection(clientToken.CLIENT_ID, clientToken.CLIENT_SECRET)
 
-#percorrendo todas linhas do df
-for index, row in df.iterrows():
-	trackName=row['music_name']
-	artistName=row['art_name']
+with open('matchSpotify4Mula.csv', 'w') as arquivo_csv:
+	write = csv.writer(arquivo_csv, delimiter=',', lineterminator='\n')
 
-	response, respJson=conexaoSpotify.trackSearch(trackName,artistName)
-	print('Nome buscado: '+ trackName)
+	#percorrendo todas linhas do df
+	for index, row in df.iterrows():
+		trackName=row['music_name']
+		artistName=row['art_name']
 
-	for item in respJson['tracks']['items'] :
-		print('Nome no spotify: '+ item['name'])
-		#print(item['id'])
+		atributos=[]
 
-		if item['name']!=trackName:
-			print('nome diferente do esperado')
+		#obtendo atributos da musica do 4mula
+		for atributo in row:
+			atributos.append(atributo)
 
-		input("Press Enter to continue...")
-	
-	print('\n')
+		response, respJson=spotifyConnection.trackSearch(trackName,artistName)
+
+		for item in respJson['tracks']['items'] :
+			if item['name']!=trackName:
+				print('nome diferente do esperado')
+				print(trackName)
+				print(artistName)
+				print(item['name'])
+				input("Press Enter to continue...")
+
+			ID=item['id']
+
+			response, respJson=spotifyConnection.get_audioFeatures(ID)
+
+			#obtendo atributos da musica do spotify
+			for chave in respJson:
+				atributos.append(respJson[chave])
+
+			#salvar dados do spotify + 4mula aqui dentro
+
+			write.writerow(atributos)

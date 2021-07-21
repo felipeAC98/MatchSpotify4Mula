@@ -48,7 +48,7 @@ class spotifyAPIConection():
 			self.getToken()
 			self.updateHeader()
 
-			response = requests.get(url=self.url+session+urlValue,headers=self.header )
+			response = requests.get(url=self.url+session+str(urlValue),headers=self.header )
 
 		return response, response.json()
 
@@ -70,3 +70,9 @@ class spotifyAPIConection():
 		searchValue='track:'+trackName+'%20artist:'+artistName
 
 		return self.search('track',searchValue)
+
+	def get_audioFeatures(self, ID):
+
+		session='audio-features/'
+
+		return self.sendRequest(session,ID)
