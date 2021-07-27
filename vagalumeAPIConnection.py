@@ -9,10 +9,10 @@ class vagalumeAPIConnection():
 		self.APIKEY=str(APIKEY)
 
 	def sendRequest(self, session, urlAttribute):
-
-		key='apikey={'+self.APIKEY+'}'
 		
-		url=self.url+session+str(urlAttribute)+key
+		url=self.url+session+str(urlAttribute)
+
+		print(url)
 		response = requests.get(url=url)
 
 		return response, response.json()
@@ -37,9 +37,13 @@ class vagalumeAPIConnection():
 
 		urlAttribute=urlAttribute+'&limit='+str(limit)
 
+		key='apikey={'+self.APIKEY+'}'
+
+		urlAttribute=urlAttribute+key
+
 		return self.sendRequest(session, urlAttribute)
 
-	def getSpecificRank(self, artID, musID, period='daily', limit=10, periodStart=None, periodEnd=None):
+	def getSpecificRank(self, artID, musID, period='monthly', limit=10, periodStart=None, periodEnd=None):
 
 		session='rankArtist.php?'
 
@@ -50,6 +54,12 @@ class vagalumeAPIConnection():
 		urlAttribute=urlAttribute+'&period='+str(period)
 
 		urlAttribute=urlAttribute+'&limit='+str(limit)
+
+		if periodStart!=None and periodEnd!=None:
+
+			urlAttribute=urlAttribute+'&periodStart='+str(periodStart)
+
+			urlAttribute=urlAttribute+'&periodEnd='+str(periodEnd)
 
 		return self.sendRequest(session, urlAttribute)
 
@@ -67,10 +77,10 @@ def test_SpecificRank():
 
 	#print(json.dumps(respJson, indent=4, sort_keys=True))
 
-	artID='3ade68b6gfd79eda3'
-	musicID='3ade68b6gc207fda3'
+	artID='3ade68b6g2480fda3'
+	musicID='3ade68b8g9410afa3'
 
-	response, respJson=vagalumeConnection.getSpecificRank(artID,musicID, period='daily', limit=10, periodStart=None, periodEnd=None)
+	response, respJson=vagalumeConnection.getSpecificRank(artID,musicID, period='monthly', limit=10, periodStart='2021-05', periodEnd='2021-07')
 
 	print(response)
 	print(json.dumps(respJson, indent=4, sort_keys=True))
