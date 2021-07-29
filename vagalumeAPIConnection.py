@@ -1,5 +1,6 @@
 import requests
 import json
+import logger
 
 class vagalumeAPIConnection():
 
@@ -9,7 +10,11 @@ class vagalumeAPIConnection():
 
 		self.APIKEY=str(APIKEY)
 
+		self.logger=logger.setup_logger("vagalumeAPI")
+
 	def sendRequest(self, session, urlAttribute):
+
+		self.logger.debug("sendRequest")
 
 		key='&apikey={'+self.APIKEY+'}'
 
@@ -17,12 +22,19 @@ class vagalumeAPIConnection():
 
 		url=self.url+session+str(urlAttribute)
 
-		print(url)
 		response = requests.get(url=url)
+
+		self.logger.debug("url:"+ str(url))
+
+		self.logger.debug("response: " + str(response))
+
+		self.logger.debug("response.json(): " + str(response.json()))
 
 		return response, response.json()
 
 	def getGeneralRank(self, rankType=None, period=None, periodVal=None, scope=None, limit=10):
+
+		self.logger.debug("getGeneralRank")
 
 		session='rank.php?'
 
@@ -45,6 +57,8 @@ class vagalumeAPIConnection():
 		return self.sendRequest(session, urlAttribute)
 
 	def getSpecificRank(self, artID, musID, period='monthly', limit=10, periodStart=None, periodEnd=None):
+
+		self.logger.debug("getSpecificRank")
 
 		session='rankArtist.php?'
 

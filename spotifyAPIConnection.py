@@ -1,5 +1,6 @@
 import requests
 import urllib
+import logger
 
 class spotifyAPIConnection():
 
@@ -15,6 +16,8 @@ class spotifyAPIConnection():
 		self.header={
 			'Authorization': 'Bearer {token}'.format(token=self.access_token)
 		}
+
+		self.logger=logger.setup_logger("vagalumeAPI")
 
 	#https://stmorse.github.io/journal/spotify-api.html
 	def getToken(self):
@@ -40,6 +43,8 @@ class spotifyAPIConnection():
 
 	def sendRequest(self, session, urlValue):
 
+		self.logger.debug("sendRequest")
+
 		response = requests.get(url=self.url+session+urlValue,headers=self.header )
 
 		#Verificando se o status eh 200 OK para prosseguir com codigo
@@ -50,28 +55,42 @@ class spotifyAPIConnection():
 
 			response = requests.get(url=self.url+session+str(urlValue),headers=self.header )
 
+		self.logger.debug("response:"+ str(response))
+
+		#self.logger.debug("response.json():"+ str(response.json()))
+
 		return response, response.json()
 
 	#Funcao responsavel por realizar buscas pelo banco do spotify
 	#as buscas sao feitas a partir de um vType(artista, nome musica...) e o value a ser buscado 
 	def search(self, vType, searchValue):
 
+		self.logger.debug("search")
+
 		session='search?'
 
 		urlValue='q='+searchValue+'&type='+vType
 
+		self.logger.debug("urlValue: "+ str(urlValue))
+
 		return self.sendRequest(session,urlValue)
 
 	def trackSearch(self, trackName, artistName):
+
+		self.logger.debug("trackSearch")
 
 		trackName=urllib.parse.quote(trackName)
 		artistName=urllib.parse.quote(artistName)
 
 		searchValue='track:'+trackName+'%20artist:'+artistName
 
+		self.logger.debug("searchValue: "+ str(searchValue))
+
 		return self.search('track',searchValue)
 
 	def get_audioFeatures(self, ID):
+		
+		self.logger.debug("get_audioFeatures")
 
 		session='audio-features/'
 
