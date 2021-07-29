@@ -1,4 +1,5 @@
 import requests
+import json
 
 class vagalumeAPIConnection():
 
@@ -61,7 +62,14 @@ class vagalumeAPIConnection():
 
 		urlAttribute=urlAttribute+'&limit='+str(limit)
 
-		return self.sendRequest(session, urlAttribute)
+		response, respJson= self.sendRequest(session, urlAttribute)
+		#print(json.dumps(respJson, indent=4, sort_keys=True))
+
+		period=period[:-2]
+
+		rank=respJson['music'][period][musID][limit-1]['rank']
+
+		return rank
 
 def test_SpecificRank():
 
@@ -73,16 +81,15 @@ def test_SpecificRank():
 
 	vagalumeConnection=vagalumeAPIConnection(APIKEY)
 
-	response, respJson=vagalumeConnection.getGeneralRank(rankType='mus', period='month', periodVal='202106', scope='all', limit=2000)
+	#response, respJson=vagalumeConnection.getGeneralRank(rankType='mus', period='month', periodVal='202106', scope='all', limit=2)
 
-	print(json.dumps(respJson, indent=4, sort_keys=True))
+	#print(json.dumps(respJson, indent=4, sort_keys=True))
 
 	artID='3ade68b6g28c9eda3'
 	musicID='3ade68b7g955b3ea3'
 
-	#response, respJson=vagalumeConnection.getSpecificRank(artID,musicID, period='monthly',limit=2,  periodStart='2020-01', periodEnd='2020-02')
+	rank=vagalumeConnection.getSpecificRank(artID,musicID, period='monthly',limit=1,  periodStart='2020-01', periodEnd='2020-02')
 
-	#print(response)
-	#print(json.dumps(respJson, indent=4, sort_keys=True))
+	print(rank)
 
 	return None
