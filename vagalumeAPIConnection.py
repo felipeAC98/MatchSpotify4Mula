@@ -9,7 +9,11 @@ class vagalumeAPIConnection():
 		self.APIKEY=str(APIKEY)
 
 	def sendRequest(self, session, urlAttribute):
-		
+
+		key='&apikey={'+self.APIKEY+'}'
+
+		urlAttribute=urlAttribute+key
+
 		url=self.url+session+str(urlAttribute)
 
 		print(url)
@@ -37,10 +41,6 @@ class vagalumeAPIConnection():
 
 		urlAttribute=urlAttribute+'&limit='+str(limit)
 
-		key='apikey={'+self.APIKEY+'}'
-
-		urlAttribute=urlAttribute+key
-
 		return self.sendRequest(session, urlAttribute)
 
 	def getSpecificRank(self, artID, musID, period='monthly', limit=10, periodStart=None, periodEnd=None):
@@ -53,13 +53,13 @@ class vagalumeAPIConnection():
 
 		urlAttribute=urlAttribute+'&period='+str(period)
 
-		urlAttribute=urlAttribute+'&limit='+str(limit)
-
-		if periodStart!=None and periodEnd!=None:
+		if  periodStart!=None and periodEnd!=None:
 
 			urlAttribute=urlAttribute+'&periodStart='+str(periodStart)
 
 			urlAttribute=urlAttribute+'&periodEnd='+str(periodEnd)
+
+		urlAttribute=urlAttribute+'&limit='+str(limit)
 
 		return self.sendRequest(session, urlAttribute)
 
@@ -73,16 +73,16 @@ def test_SpecificRank():
 
 	vagalumeConnection=vagalumeAPIConnection(APIKEY)
 
-	#response, respJson=vagalumeConnection.getGeneralRank(rankType='mus', period='month', periodVal='202106', scope='all', limit=10)
+	response, respJson=vagalumeConnection.getGeneralRank(rankType='mus', period='month', periodVal='202106', scope='all', limit=2000)
 
-	#print(json.dumps(respJson, indent=4, sort_keys=True))
-
-	artID='3ade68b6g2480fda3'
-	musicID='3ade68b8g9410afa3'
-
-	response, respJson=vagalumeConnection.getSpecificRank(artID,musicID, period='monthly', limit=10, periodStart='2021-05', periodEnd='2021-07')
-
-	print(response)
 	print(json.dumps(respJson, indent=4, sort_keys=True))
+
+	artID='3ade68b6g28c9eda3'
+	musicID='3ade68b7g955b3ea3'
+
+	#response, respJson=vagalumeConnection.getSpecificRank(artID,musicID, period='monthly',limit=2,  periodStart='2020-01', periodEnd='2020-02')
+
+	#print(response)
+	#print(json.dumps(respJson, indent=4, sort_keys=True))
 
 	return None

@@ -7,10 +7,10 @@ df = pd.read_parquet('4mula_metadata.parquet')
 df.drop(['music_lyrics'], axis=1,inplace=True)
 
 #conectando a API
-import spotifyAPIConection
+import spotifyAPIConnection
 import clientToken
 
-spotifyConnection=spotifyAPIConection.spotifyAPIConection(clientToken.CLIENT_ID, clientToken.CLIENT_SECRET)
+spotifyConnection=spotifyAPIConnection.spotifyAPIConnection(clientToken.CLIENT_ID, clientToken.CLIENT_SECRET)
 
 with open('matchSpotify4Mula.csv', 'w') as arquivo_csv:
 	write = csv.writer(arquivo_csv, delimiter=',', lineterminator='\n')
@@ -44,6 +44,5 @@ with open('matchSpotify4Mula.csv', 'w') as arquivo_csv:
 			for chave in respJson:
 				atributos.append(respJson[chave])
 
-			#salvar dados do spotify + 4mula aqui dentro
-
+			#salvando dados do spotify + 4mula
 			write.writerow(atributos)
