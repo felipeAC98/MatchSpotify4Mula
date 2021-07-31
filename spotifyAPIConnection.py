@@ -17,7 +17,7 @@ class spotifyAPIConnection():
 			'Authorization': 'Bearer {token}'.format(token=self.access_token)
 		}
 
-		self.logger=logger.setup_logger("vagalumeAPI")
+		self.logger=logger.setup_logger("spotifyAPI")
 
 	#https://stmorse.github.io/journal/spotify-api.html
 	def getToken(self):
