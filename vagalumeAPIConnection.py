@@ -81,7 +81,9 @@ class vagalumeAPIConnection():
 
 		period=period[:-2]
 
-		rank=respJson['music'][period][musID][limit-1]['rank']
+		musicLen=len(respJson['music'][period][musID])
+
+		rank=respJson['music'][period][musID][musicLen-1]['rank']
 
 		return rank
 
