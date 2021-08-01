@@ -1,9 +1,10 @@
 import csv
 import logger
+import traceback
 
 #carregando dados 4mula
 import pandas as pd
-df = pd.read_parquet('4mula_metadata.parquet')
+df = pd.read_parquet('4mula_tiny.parquet')
 #removando algumas features grandes e desnecessarias
 df.drop(['melspectrogram'], axis=1,inplace=True)
 df.drop(['music_lyrics'], axis=1,inplace=True)
@@ -31,7 +32,7 @@ with open('matchSpotify4Mula.csv', 'w') as arquivo_csv:
 		artID=row['art_id']
 
 
-		logging.debug(' artistName: '+str(artistName)+ ' trackName: '+str(trackName)+' artID: '+str(artID)+' musID: '+str(musID))
+		logging.debug(' 4Mula artistName: '+str(artistName)+ ' 4Mula trackName: '+str(trackName)+' artID: '+str(artID)+' musID: '+str(musID))
 
 		features=[]
 		_4mulaFeatureNames=['music_id', 'music_name', 'music_lang', 'art_id','art_name', 'art_rank', 'main_genre', 'related_genre','musicnn_tags']
@@ -44,18 +45,16 @@ with open('matchSpotify4Mula.csv', 'w') as arquivo_csv:
 				features.append(row[feature])
 			except:
 				logging.debug(' feature nao encontrada: '+str(feature))
+		
 		#Fazendo o match no spotify
 		response, respJson=spotifyConnection.trackSearch(trackName,artistName)
 
 		for item in respJson['tracks']['items'] :
+			
+			#Somente matchs exatamente iguais serao considerados
 			if item['name']!=trackName:
-				logging.debug('nome diferente do esperado')
-		
-				print('nome diferente do esperado')
-				print(trackName)
-				print(artistName)
-				print(item['name'])
-				input("Press Enter to continue...")
+				logging.debug(' nome diferente, discartando musica Spotify: '+str(item['name']))
+				continue
 
 			ID=item['id']
 
@@ -67,9 +66,17 @@ with open('matchSpotify4Mula.csv', 'w') as arquivo_csv:
 					features.append(respJson[key])
 
 			#obtendo rank da musica
-			rank=vagalumeConnection.getSpecificRank(artID, musID, period='monthly', limit=1)
+			try:
+				rank=vagalumeConnection.getSpecificRank(artID, musID, period='monthly', limit=2)
+			except:
+				logging.warning(' erro ao obter rank: '+str(traceback.format_exc()))
+				break
 
 			features.append(rank)
 
+			logging.warning(' salvando features: '+str(features))
 			#salvando dados do spotify + 4mula
 			write.writerow(features)
+
+			#assim que localizar um match saira da iteracao
+			break
