@@ -83,9 +83,13 @@ class vagalumeAPIConnection():
 
 		musicLen=len(respJson['music'][period][musID])
 
-		rank=respJson['music'][period][musID][musicLen-1]['rank']
+		rank=respJson['music'][period][musID][musicLen-1]['rank']		#Contém a pontuação da música baseado na quantidade de acessos.
+		periodR=respJson['music'][period][musID][musicLen-1]['period']
+		position=respJson['music'][period][musID][musicLen-1]['pos'] 	#Contém a posição da música no rank de top músicas do Vagalume.
 
-		return rank
+		#self.logger.debug("getSpecificRank: period: "+str(periodR))	
+
+		return rank, position, periodR
 
 def test_SpecificRank():
 
@@ -101,8 +105,8 @@ def test_SpecificRank():
 
 	#print(json.dumps(respJson, indent=4, sort_keys=True))
 
-	artID='3ade68b6g28c9eda3'
-	musicID='3ade68b7g955b3ea3'
+	artID='3ade68b7g6b960ea3'
+	musicID='3ade68b8g42c34fa3'
 
 	rank=vagalumeConnection.getSpecificRank(artID,musicID, period='monthly',limit=1,  periodStart='2020-01', periodEnd='2020-02')
 

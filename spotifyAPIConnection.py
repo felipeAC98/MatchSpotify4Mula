@@ -1,6 +1,8 @@
 import requests
 import urllib
 import logger
+from time import sleep as sleep
+import traceback
 
 class spotifyAPIConnection():
 
@@ -45,15 +47,33 @@ class spotifyAPIConnection():
 
 		self.logger.debug("sendRequest")
 
-		response = requests.get(url=self.url+session+urlValue,headers=self.header )
+		status_code=0
+		waitTime=4
+		tentativas=0
 
 		#Verificando se o status eh 200 OK para prosseguir com codigo
-		if response.status_code!=200:
-			print(response)
-			self.getToken()
-			self.updateHeader()
+		while(status_code!=200 and tentativas<3):
 
-			response = requests.get(url=self.url+session+str(urlValue),headers=self.header )
+			try:
+				response = requests.get(url=self.url+session+urlValue,headers=self.header )
+				status_code=response.status_code
+
+				if status_code!=200:
+					sleep(waitTime)
+					self.logger.debug(" request fail:"+ str(response))
+					print(response)
+					self.access_token=self.getToken()
+					self.updateHeader()
+
+			except:
+				self.logger.warning(' erro sendRequest: '+str(traceback.format_exc()))
+
+				sleep(waitTime)
+
+			waitTime=waitTime*2
+			tentativas=tentativas+1
+
+			#response = requests.get(url=self.url+session+str(urlValue),headers=self.header )
 
 		self.logger.debug("response:"+ str(response))
 
