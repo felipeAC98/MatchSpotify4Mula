@@ -4,13 +4,17 @@ import traceback
 
 #carregando dados 4mula
 import pandas as pd
-df = pd.read_parquet('4mula_metadata.parquet')
+df = pd.read_parquet('4mula_tiny.parquet')
 
 for col in df.columns:
 	print(col)
 
 #removando algumas features grandes e desnecessarias
-#df.drop(['melspectrogram'], axis=1,inplace=True)
+try:
+	df.drop(['melspectrogram'], axis=1,inplace=True)
+except:
+	logging.warning(' feature melspectrogram nao encontrada para dropar: '+str(traceback.format_exc()))
+
 df.drop(['music_lyrics'], axis=1,inplace=True)
 
 #conectando as API
@@ -27,13 +31,13 @@ logging=logger.setup_logger("matchSpotify4Mula")
 _4mulaFeatureNames=['music_id', 'music_name', 'music_lang', 'art_id','art_name', 'art_rank', 'main_genre', 'related_genre','musicnn_tags']
 _spotifyFeatureNames=['danceability','energy','key','mode','speechiness','acousticness','instrumentalness','liveness','valence','tempo','duration_ms','time_signature']
 
-fieldnames=_4mulaFeatureNames+_spotifyFeatureNames+['period']+['position']+['mus_rank']
+fieldnames=_4mulaFeatureNames+_spotifyFeatureNames+['release_date']+['period']+['position']+['mus_rank']
 
 totalDeFalhas=0
 tMusicasNLocalizadasSpotify=0
-ultMusID='3ade68b8g76dbb0b3'	#somente para caso o processo pare no meio da execucao, este valor sera a ultima musica obtida no csv
+ultMusID=0	#somente para caso o processo pare no meio da execucao, este valor sera a ultima musica obtida no csv
 
-with open('matchSpotify4Mula-large.csv', 'a') as arquivo_csv:
+with open('matchSpotify4Mula-tiny.csv', 'a') as arquivo_csv:
 	write = csv.DictWriter(arquivo_csv, delimiter=',', lineterminator='\n',fieldnames = fieldnames)
 
 	#percorrendo todas linhas do df
@@ -85,11 +89,16 @@ with open('matchSpotify4Mula-large.csv', 'a') as arquivo_csv:
 			ID=item['id']
 
 			response, respJson=spotifyConnection.get_audioFeatures(ID)
+			release_date=spotifyConnection.get_releaseDate(ID)
 
 			#obtendo atributos da musica do spotify
 			for key in respJson:
 				if key in _spotifyFeatureNames:
 					features[key]=respJson[key]
+
+			logging.debug(' release_date: '+str(release_date))
+			#adicionando feature spotify 
+			features['release_date']=release_date
 
 			#obtendo rank da musica
 			try:

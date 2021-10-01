@@ -115,3 +115,20 @@ class spotifyAPIConnection():
 		session='audio-features/'
 
 		return self.sendRequest(session,ID)
+
+	def get_track(self, ID):
+
+		self.logger.debug("get_audioFeatures")
+
+		session='tracks/'
+
+		return self.sendRequest(session,ID)
+
+	def get_releaseDate(self,ID):
+
+		self.logger.debug("get_releaseDate")
+
+		response, respJson=self.get_track(ID)
+
+		return respJson['album']['release_date']
+
