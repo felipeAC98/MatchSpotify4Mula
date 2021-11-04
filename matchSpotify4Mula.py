@@ -58,15 +58,14 @@ def matchSpotify4Mula():
 			musID=row['music_id']
 			artID=row['art_id']
 
-
-			logging.debug(' 4Mula artistName: '+str(artistName)+ ' 4Mula trackName: '+str(trackName)+' artID: '+str(artID)+' musID: '+str(musID))
+			#logging.debug(' 4Mula artistName: '+str(artistName)+ ' 4Mula trackName: '+str(trackName)+' artID: '+str(artID)+' musID: '+str(musID))
 
 			features={}
 
 			#obtendo atributos da musica do 4mula
 			for feature in _4mulaFeatureNames:
 				try:
-					logging.debug(' feature: '+str(row[feature]))
+					#logging.debug(' feature: '+str(row[feature]))
 					features[feature]=row[feature]
 				except:
 					logging.debug(' feature nao encontrada: '+str(feature))
