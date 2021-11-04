@@ -1,6 +1,7 @@
 import requests
 import json
 import logger
+import traceback
 
 class vagalumeAPIConnection():
 
@@ -93,7 +94,19 @@ class vagalumeAPIConnection():
 
 		return musRank, artRank, position, periodR
 
-def test_SpecificRank():
+	def getNSetSpecificRank(self, vagalumeFeatures, artID, musID, anPeriod='monthly', limit=10, periodStart=None, periodEnd=None):
+
+		try:
+			mus_rank, art_rank, position, period=self.getSpecificRank(artID, musID, anPeriod, limit, periodStart, periodEnd)
+
+			vagalumeFeatures['mus_rank']=mus_rank
+			vagalumeFeatures['art_rank']=art_rank
+			vagalumeFeatures['position']=position
+			vagalumeFeatures['period']=period
+		except: 
+			self.logger.warning(' erro getNSetSpecificRank: '+str(traceback.format_exc()))
+
+def test_SpecificRank(self, artID, musID, period='monthly', limit=10, periodStart=None, periodEnd=None):
 
 	#conectando a API
 	import clientToken
