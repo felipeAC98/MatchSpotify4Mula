@@ -4,10 +4,13 @@ import traceback
 
 #carregando dados 4mula
 import pandas as pd
-df = pd.read_parquet('4mula_tiny.parquet')
+arquivoBase='4mula_metadata'
+df = pd.read_parquet('4mula_metadata.parquet')
 
 for col in df.columns:
 	print(col)
+
+logging=logger.setup_logger("matchSpotify4Mula")
 
 #removando algumas features grandes e desnecessarias
 try:
@@ -26,18 +29,21 @@ vagalumeConnection=vagalumeAPIConnection.vagalumeAPIConnection(clientToken.VAGAL
 
 spotifyConnection=spotifyAPIConnection.spotifyAPIConnection(clientToken.CLIENT_ID, clientToken.CLIENT_SECRET)
 
-logging=logger.setup_logger("matchSpotify4Mula")
+_4mulaFeatureNames=['music_id', 'music_name', 'music_lang', 'art_id','art_name', 'art_rank4Mula', 'main_genre', 'related_genre','musicnn_tags']
 
-_4mulaFeatureNames=['music_id', 'music_name', 'music_lang', 'art_id','art_name', 'art_rank', 'main_genre', 'related_genre','musicnn_tags']
-_spotifyFeatureNames=['danceability','energy','key','mode','speechiness','acousticness','instrumentalness','liveness','valence','tempo','duration_ms','time_signature']
+_spotifyBasicAudioFeature=['danceability','energy','key','mode','speechiness','loudness','acousticness','instrumentalness','liveness','valence','tempo','duration_ms','time_signature']
+_spotifyAudioAnalysisTrack=['num_samples','tempo_confidence','time_signature_confidence','key_confidence','mode_confidence']
+_spotifyAudioAnalysis=['bars','beats','sections','segments','tatums']
 
-fieldnames=_4mulaFeatureNames+_spotifyFeatureNames+['release_date']+['period']+['position']+['mus_rank']
+fieldnames=_4mulaFeatureNames+['spotify_trackID']+_spotifyBasicAudioFeature+['spotifyAlbum_id']+['release_date'] +['popularity']+['spotifyArt_id']+_spotifyAudioAnalysisTrack+_spotifyAudioAnalysis+['period']+['position']+['mus_rank']+['art_rank']
 
 totalDeFalhas=0
 tMusicasNLocalizadasSpotify=0
 ultMusID=0	#somente para caso o processo pare no meio da execucao, este valor sera a ultima musica obtida no csv
+totMus=0
 
-with open('matchSpotify4Mula-tiny.csv', 'a') as arquivo_csv:
+with open(arquivoBase+'.csv', 'a') as arquivo_csv:
+
 	write = csv.DictWriter(arquivo_csv, delimiter=',', lineterminator='\n',fieldnames = fieldnames)
 
 	#percorrendo todas linhas do df
@@ -86,23 +92,38 @@ with open('matchSpotify4Mula-tiny.csv', 'a') as arquivo_csv:
 				logging.debug(' nome diferente, descartando musica Spotify')
 				continue
 
-			ID=item['id']
+			features['spotify_trackID']=item['id']
 
-			response, respJson=spotifyConnection.get_audioFeatures(ID)
-			release_date=spotifyConnection.get_releaseDate(ID)
+			#obtendo atributos basicos da musica do spotify ==== _spotifyBasicAudioFeature
+			response, respJson=spotifyConnection.get_audioFeatures(features['spotify_trackID'])
 
-			#obtendo atributos da musica do spotify
 			for key in respJson:
-				if key in _spotifyFeatureNames:
+				if key in _spotifyBasicAudioFeature:
 					features[key]=respJson[key]
 
-			logging.debug(' release_date: '+str(release_date))
-			#adicionando feature spotify 
-			features['release_date']=release_date
+			#obtendo atributos basicos da musica do spotify ==== _spotifyTrackInfoAlbum e relacionados
+			response, respJson=spotifyConnection.get_track(features['spotify_trackID'])
 
-			#obtendo rank da musica
+			features["spotifyAlbum_id"]=respJson['album']["id"]
+			features["spotifyAlbum_id"]=respJson['album']["release_date"]
+			features["popularity"]=respJson['popularity']
+			features["spotifyArt_id"]=respJson['artists'][0]["id"]
+
+			#obtendo atributos basicos da musica do spotify ==== _spotifyAudioAnalysisTrack
+			response, respJson=spotifyConnection.get_audioAnalysis(features['spotify_trackID'])
+
+			for key in respJson:
+				if key in _spotifyAudioAnalysisTrack:
+					features[key]=respJson['track'][key]
+
+			#obtendo atributos basicos da musica do spotify ==== _spotifyAudioAnalysis
+			for key in respJson:
+				if key in _spotifyAudioAnalysis:
+					features[key]=len(respJson[key])
+
+			#obtendo rank da musica == VAGALUME
 			try:
-				rank,position,period=vagalumeConnection.getSpecificRank(artID, musID, period='monthly', limit=2)
+				musRank,artRank,position,period=vagalumeConnection.getSpecificRank(artID, musID, period='monthly', limit=2)
 			except:
 				totalDeFalhas=totalDeFalhas+1
 				logging.warning(' erro ao obter rank: '+str(traceback.format_exc()))
@@ -111,12 +132,15 @@ with open('matchSpotify4Mula-tiny.csv', 'a') as arquivo_csv:
 			#features.append(rank)
 			features['period']=period
 			features['position']=position
-			features['mus_rank']=rank
+			features['mus_rank']=musRank
+			features['art_rank']=artRank
 
 			logging.debug(' salvando amostra')
 			#salvando dados do spotify + 4mula
 			write.writerow(features)
 
+			print("Total de musicas: "+str(totMus))
+			totMus+=1
 			#assim que localizar um match saira da iteracao
 			break
 

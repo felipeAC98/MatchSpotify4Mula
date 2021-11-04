@@ -28,7 +28,7 @@ class vagalumeAPIConnection():
 
 		self.logger.debug("response: " + str(response))
 
-		self.logger.debug("response.json(): " + str(response.json()))
+		#self.logger.debug("response.json(): " + str(response.json()))
 
 		return response, response.json()
 
@@ -83,13 +83,15 @@ class vagalumeAPIConnection():
 
 		musicLen=len(respJson['music'][period][musID])
 
-		rank=respJson['music'][period][musID][musicLen-1]['rank']		#Contém a pontuação da música baseado na quantidade de acessos.
+		musRank=respJson['music'][period][musID][musicLen-1]['rank']		#Contém a pontuação da música baseado na quantidade de acessos.
 		periodR=respJson['music'][period][musID][musicLen-1]['period']
 		position=respJson['music'][period][musID][musicLen-1]['pos'] 	#Contém a posição da música no rank de top músicas do Vagalume.
 
+		artRank=respJson['artist'][period][musicLen-1]['pos'] 	#Contém a posição da música no rank de top músicas do Vagalume.
+
 		#self.logger.debug("getSpecificRank: period: "+str(periodR))	
 
-		return rank, position, periodR
+		return musRank, artRank, position, periodR
 
 def test_SpecificRank():
 

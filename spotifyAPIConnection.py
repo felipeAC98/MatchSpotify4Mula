@@ -132,3 +132,32 @@ class spotifyAPIConnection():
 
 		return respJson['album']['release_date']
 
+	def get_audioAnalysis(self,ID):
+
+		self.logger.debug("get_audioAnalysis")
+
+		session='audio-analysis/'
+
+		return self.sendRequest(session,ID)
+
+	def get_audioAnalysisResumed(self,ID):
+
+		self.logger.debug("get_audioAnalysisResumed")
+
+		session='audio-analysis/'
+
+		response, respJson=self.sendRequest(session,ID)
+
+		tempo_confidence=respJson['track']['tempo_confidence']
+		time_signature_confidence=respJson['track']['time_signature_confidence']
+		key_confidence=respJson['track']['key_confidence']
+		mode_confidence=respJson['track']['mode_confidence']
+
+		bars=len(respJson['bars'])
+		beats=len(respJson['beats'])
+		sections=len(respJson['sections'])
+		segments=len(respJson['segments'])
+		tatums=len(respJson['tatums'])
+
+		print(respJson['track']['tempo_confidence'])
+		return respJson
