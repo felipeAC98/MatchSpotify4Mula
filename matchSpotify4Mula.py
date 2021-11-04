@@ -105,14 +105,14 @@ with open(arquivoBase+'.csv', 'a') as arquivo_csv:
 			response, respJson=spotifyConnection.get_track(features['spotify_trackID'])
 
 			features["spotifyAlbum_id"]=respJson['album']["id"]
-			features["spotifyAlbum_id"]=respJson['album']["release_date"]
+			features["release_date"]=respJson['album']["release_date"]
 			features["popularity"]=respJson['popularity']
 			features["spotifyArt_id"]=respJson['artists'][0]["id"]
 
 			#obtendo atributos basicos da musica do spotify ==== _spotifyAudioAnalysisTrack
 			response, respJson=spotifyConnection.get_audioAnalysis(features['spotify_trackID'])
 
-			for key in respJson:
+			for key in respJson['track']:
 				if key in _spotifyAudioAnalysisTrack:
 					features[key]=respJson['track'][key]
 
@@ -135,6 +135,7 @@ with open(arquivoBase+'.csv', 'a') as arquivo_csv:
 			features['mus_rank']=musRank
 			features['art_rank']=artRank
 
+			print(features)
 			logging.debug(' salvando amostra')
 			#salvando dados do spotify + 4mula
 			write.writerow(features)
