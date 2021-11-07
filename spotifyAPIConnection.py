@@ -161,3 +161,11 @@ class spotifyAPIConnection():
 
 		print(respJson['track']['tempo_confidence'])
 		return respJson
+
+	def get_artistInfo(self,ID):
+
+		self.logger.debug("get_artistInfo")
+
+		session='artists/'
+
+		return self.sendRequest(session,ID)
