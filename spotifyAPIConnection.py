@@ -110,45 +110,45 @@ class spotifyAPIConnection():
 
 		return self.search('track',searchValue)
 
-	def get_audioFeatures(self, ID):
+	def get_audioFeatures(self, trackID):
 		
 		self.logger.debug("get_audioFeatures")
 
 		session='audio-features/'
 
-		return self.sendRequest(session,ID)
+		return self.sendRequest(session,trackID)
 
-	def get_track(self, ID):
+	def get_track(self, trackID):
 
 		self.logger.debug("get_audioFeatures")
 
 		session='tracks/'
 
-		return self.sendRequest(session,ID)
+		return self.sendRequest(session,trackID)
 
-	def get_releaseDate(self,ID):
+	def get_releaseDate(self,trackID):
 
 		self.logger.debug("get_releaseDate")
 
-		response, respJson=self.get_track(ID)
+		response, respJson=self.get_track(trackID)
 
 		return respJson['album']['release_date']
 
-	def get_audioAnalysis(self,ID):
+	def get_audioAnalysis(self,trackID):
 
 		self.logger.debug("get_audioAnalysis")
 
 		session='audio-analysis/'
 
-		return self.sendRequest(session,ID)
+		return self.sendRequest(session,trackID)
 
-	def get_audioAnalysisResumed(self,ID):
+	def get_audioAnalysisResumed(self,trackID):
 
 		self.logger.debug("get_audioAnalysisResumed")
 
 		session='audio-analysis/'
 
-		response, respJson=self.sendRequest(session,ID)
+		response, respJson=self.sendRequest(session,trackID)
 
 		tempo_confidence=respJson['track']['tempo_confidence']
 		time_signature_confidence=respJson['track']['time_signature_confidence']
@@ -164,19 +164,19 @@ class spotifyAPIConnection():
 		print(respJson['track']['tempo_confidence'])
 		return respJson
 
-	def get_artistInfo(self,ID):
+	def get_artistInfo(self,artistID):
 
 		self.logger.debug("get_artistInfo")
 
 		session='artists/'
 
-		return self.sendRequest(session,ID)
+		return self.sendRequest(session,artistID)
 
-	def get_genres(self,ID):
+	def get_genres(self,trackID):
 
 		self.logger.debug("get_genres")
 
-		response, respJson=self.get_track(ID)
+		response, respJson=self.get_track(trackID)
 
 		genres=[]
 
