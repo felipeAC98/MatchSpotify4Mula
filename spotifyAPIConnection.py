@@ -3,6 +3,8 @@ import urllib
 import logger
 from time import sleep as sleep
 import traceback
+import clientToken
+import json
 
 class spotifyAPIConnection():
 
@@ -169,3 +171,34 @@ class spotifyAPIConnection():
 		session='artists/'
 
 		return self.sendRequest(session,ID)
+
+	def get_genres(self,ID):
+
+		self.logger.debug("get_genres")
+
+		response, respJson=self.get_track(ID)
+
+		genres=[]
+
+		for artist in respJson['artists']:
+
+			artistID=artist['id']
+			response,artistInfoJson=self.get_artistInfo(artistID)
+
+			for genre in artistInfoJson['genres']:
+
+				genres.append(genre)
+
+		return genres
+
+class spotifyAPIConnectionTests():
+
+	def __init__(self):
+		self.spotifyConnection=spotifyAPIConnection(clientToken.CLIENT_ID, clientToken.CLIENT_SECRET)
+
+
+	def test_genre(self):
+		response, respJson=self.spotifyConnection.trackSearch("Starlight","Muse")
+		trackID=respJson['tracks']['items'][0]['id']
+
+		print("Generos obtidos: "+str(self.spotifyConnection.get_genres(trackID)))

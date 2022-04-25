@@ -1,0 +1,5 @@
+import spotifyAPIConnection
+
+spotifyConnection=spotifyAPIConnection.spotifyAPIConnectionTests()
+
+spotifyConnection.test_genre()
