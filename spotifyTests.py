@@ -3,3 +3,5 @@ import spotifyAPIConnection
 spotifyConnection=spotifyAPIConnection.spotifyAPIConnectionTests()
 
 spotifyConnection.test_genre()
+
+spotifyConnection.test_get_type_by_year()

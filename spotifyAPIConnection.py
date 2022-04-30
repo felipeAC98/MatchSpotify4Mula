@@ -85,13 +85,13 @@ class spotifyAPIConnection():
 
 	#Funcao responsavel por realizar buscas pelo banco do spotify
 	#as buscas sao feitas a partir de um vType(artista, nome musica...) e o value a ser buscado 
-	def search(self, vType, searchValue):
+	def search(self, vType, searchValue,limit=20,index=0):
 
 		self.logger.debug("search")
 
 		session='search?'
 
-		urlValue='q='+searchValue+'&type='+vType
+		urlValue='q='+searchValue+'&type='+vType+'&limit='+str(limit)+'&offset='+str(index)
 
 		self.logger.debug("urlValue: "+ str(urlValue))
 
@@ -191,6 +191,19 @@ class spotifyAPIConnection():
 
 		return genres
 
+	def get_type_by_year(self, _type='track',index=1,year=2020,limit=50):
+
+		self.logger.debug("get_tracks_by_year")
+
+		year=urllib.parse.quote(str(year))
+
+		searchValue='year:'+year
+
+		self.logger.debug("searchValue: "+ str(searchValue))
+
+		return self.search(_type,searchValue,limit=limit, index=index)
+
+
 class spotifyAPIConnectionTests():
 
 	def __init__(self):
@@ -201,4 +214,11 @@ class spotifyAPIConnectionTests():
 		response, respJson=self.spotifyConnection.trackSearch("Starlight","Muse")
 		trackID=respJson['tracks']['items'][0]['id']
 
+		print("Response: "+str(response))
 		print("Generos obtidos: "+str(self.spotifyConnection.get_genres(trackID)))
+
+	def test_get_type_by_year(self,year=2010):
+		response, respJson=self.spotifyConnection.get_type_by_year(_type='track',index=2,year=year)
+
+		print("Response: "+str(response))
+		print("test_get_type_by_year: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
