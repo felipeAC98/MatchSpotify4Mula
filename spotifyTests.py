@@ -1,7 +1,15 @@
 import spotifyAPIConnection
 
-spotifyConnection=spotifyAPIConnection.spotifyAPIConnectionTests()
+#Spotify connection tests
 
-spotifyConnection.test_genre()
+#spotifyConnectionTests=spotifyAPIConnection.spotifyAPIConnectionTests()
 
-spotifyConnection.test_get_type_by_year()
+#spotifyConnectionTests.test_genre()
+
+#spotifyConnectionTests.test_get_type_by_year()
+
+#Spotify data tests
+
+spotifyDataTests=spotifyAPIConnection.spotifyDataTests()
+
+spotifyDataTests.test_get_track_features()

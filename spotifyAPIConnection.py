@@ -222,3 +222,70 @@ class spotifyAPIConnectionTests():
 
 		print("Response: "+str(response))
 		print("test_get_type_by_year: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
+
+class spotifyData():
+
+	def __init__(self,_spotifyConnection=None):
+
+		if _spotifyConnection==None:
+			self.spotifyConnection=spotifyAPIConnection(clientToken.CLIENT_ID, clientToken.CLIENT_SECRET)
+		else:
+			self.spotifyConnection=_spotifyConnection
+
+	def get_track_features(self,trackID):
+
+		features={}
+
+		response, respJson=self.spotifyConnection.get_track(trackID)
+
+		#features["spotifyAlbum_id"]=respJson['album']["id"]
+		features["release_date"]=respJson['album']["release_date"]
+		features["popularity"]=respJson['popularity']
+		
+		artistID=respJson['artists'][0]["id"]
+
+		#Obtendo informacoes relacionadas com o audio de alto nivel da múusica
+		_spotifyBasicAudioFeature=['danceability','energy','key','mode','speechiness','loudness','acousticness','instrumentalness','liveness','valence','tempo','duration_ms','time_signature']
+	
+		response, respJson=self.spotifyConnection.get_audioFeatures(trackID)
+
+		for key in respJson:
+			if key in _spotifyBasicAudioFeature:
+				features[key]=respJson[key]
+
+		#Obtendo informacoes de audio de baixo nivel simplificadas da musica
+		_spotifyAudioAnalysisTrack=['num_samples','tempo_confidence','time_signature_confidence','key_confidence','mode_confidence']
+		_spotifyAudioAnalysis=['bars','beats','sections','segments','tatums']
+
+		response, respJson=self.spotifyConnection.get_audioAnalysis(trackID)
+
+		for key in respJson['track']:
+			if key in _spotifyAudioAnalysisTrack:
+				features[key]=respJson['track'][key]
+
+		for key in respJson:
+			if key in _spotifyAudioAnalysis:
+				features[key]=len(respJson[key])
+
+		#Obtendo total de seguidores do spotify
+		response, respJson=self.spotifyConnection.get_artistInfo(artistID)
+		features['totalFollowers']=respJson['followers']['total']
+
+		#Obtendo o genero da musica
+		features['genres']=self.spotifyConnection.get_genres(trackID)
+
+		return features
+
+class spotifyDataTests():
+
+	def __init__(self):
+		self.spotifyConnection=spotifyAPIConnection(clientToken.CLIENT_ID, clientToken.CLIENT_SECRET)
+		self.spotifyData=spotifyData(self.spotifyConnection)
+
+	def test_get_track_features(self):
+		response, respJson=self.spotifyConnection.trackSearch("Starlight","Muse")
+		trackID=respJson['tracks']['items'][0]['id']
+
+		features= self.spotifyData.get_track_features(trackID)
+
+		print("Features: "+str(features))
