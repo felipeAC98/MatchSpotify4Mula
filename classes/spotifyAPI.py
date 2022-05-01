@@ -191,7 +191,7 @@ class spotifyAPIConnection():
 
 		return genres
 
-	def get_type_by_year(self, _type='track',index=1,year=2020,limit=50):
+	def get_type_by_year(self, _type='track',index=1,year=2020,limit=10):
 
 		self.logger.debug("get_tracks_by_year")
 
@@ -217,8 +217,8 @@ class spotifyAPIConnectionTests():
 		print("Response: "+str(response))
 		print("Generos obtidos: "+str(self.spotifyConnection.get_genres(trackID)))
 
-	def test_get_type_by_year(self,year=2010):
-		response, respJson=self.spotifyConnection.get_type_by_year(_type='track',index=2,year=year)
+	def test_get_type_by_year(self,year=2010,limit=1):
+		response, respJson=self.spotifyConnection.get_type_by_year(_type='track',index=2,year=year,limit=limit)
 
 		print("Response: "+str(response))
 		print("test_get_type_by_year: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
