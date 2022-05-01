@@ -1,6 +1,6 @@
 import requests
 import urllib
-import logger
+import classes.logger as logger
 from time import sleep as sleep
 import traceback
 import clientToken
@@ -232,7 +232,20 @@ class spotifyData():
 		else:
 			self.spotifyConnection=_spotifyConnection
 
+		self.logger=logger.setup_logger("spotifyData")
+
+	def get_field_names(self):
+		fieldnames=[]
+
+		#Obtendo o nome dos parametros apartir de uma trackID exemplo
+		for key in  self.get_track_features("4REjaHRPmVb7btssqChJSy"):
+			fieldnames.append(key)
+
+		return fieldnames
+
 	def get_track_features(self,trackID):
+
+		self.logger.debug("get_track_features: trackID: "+str(trackID))
 
 		features={}
 
@@ -241,6 +254,8 @@ class spotifyData():
 		#features["spotifyAlbum_id"]=respJson['album']["id"]
 		features["release_date"]=respJson['album']["release_date"]
 		features["popularity"]=respJson['popularity']
+		
+		self.logger.debug("release_date: "+str(features["release_date"]))
 		
 		artistID=respJson['artists'][0]["id"]
 
