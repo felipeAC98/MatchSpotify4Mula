@@ -1,8 +1,8 @@
-import spotifyAPIConnection
+from classes.spotifyAPI import spotifyDataTests, spotifyAPIConnectionTests
 
 #Spotify connection tests
 
-#spotifyConnectionTests=spotifyAPIConnection.spotifyAPIConnectionTests()
+#spotifyConnectionTests=spotifyAPIConnectionTests()
 
 #spotifyConnectionTests.test_genre()
 
@@ -10,6 +10,6 @@ import spotifyAPIConnection
 
 #Spotify data tests
 
-spotifyDataTests=spotifyAPIConnection.spotifyDataTests()
+spotifyDataTests=spotifyDataTests()
 
 spotifyDataTests.test_get_track_features()
