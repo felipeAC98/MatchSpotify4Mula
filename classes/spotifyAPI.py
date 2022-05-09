@@ -191,13 +191,16 @@ class spotifyAPIConnection():
 
 		return genres
 
-	def get_type_by_year(self, _type='track',index=1,year=2020,limit=10):
+	def get_type_by_year(self, _type='track',genre=None, index=1,year=2020,limit=10):
 
 		self.logger.debug("get_tracks_by_year")
 
 		year=urllib.parse.quote(str(year))
 
 		searchValue='year:'+year
+
+		if genre!=None:
+			searchValue='genre:'+str(genre)
 
 		self.logger.debug("searchValue: "+ str(searchValue))
 
@@ -243,7 +246,7 @@ class spotifyData():
 
 		return fieldnames
 
-	def get_track_features(self,trackID):
+	def get_track_features(self,trackID,genre=None):
 
 		self.logger.debug("get_track_features: trackID: "+str(trackID))
 
@@ -269,7 +272,7 @@ class spotifyData():
 				features[key]=respJson[key]
 
 		#Obtendo informacoes de audio de baixo nivel simplificadas da musica
-		_spotifyAudioAnalysisTrack=['num_samples','tempo_confidence','time_signature_confidence','key_confidence','mode_confidence']
+		'''_spotifyAudioAnalysisTrack=['num_samples','tempo_confidence','time_signature_confidence','key_confidence','mode_confidence']
 		_spotifyAudioAnalysis=['bars','beats','sections','segments','tatums']
 
 		response, respJson=self.spotifyConnection.get_audioAnalysis(trackID)
@@ -280,14 +283,17 @@ class spotifyData():
 
 		for key in respJson:
 			if key in _spotifyAudioAnalysis:
-				features[key]=len(respJson[key])
+				features[key]=len(respJson[key])'''
 
 		#Obtendo total de seguidores do spotify
 		response, respJson=self.spotifyConnection.get_artistInfo(artistID)
 		features['totalFollowers']=respJson['followers']['total']
 
 		#Obtendo o genero da musica
-		features['genres']=self.spotifyConnection.get_genres(trackID)
+		if genre==None:
+			features['genres']=self.spotifyConnection.get_genres(trackID)
+		else:
+			features['genres']=genre
 
 		return features
 
