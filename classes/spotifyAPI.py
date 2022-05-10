@@ -50,11 +50,11 @@ class spotifyAPIConnection():
 		self.logger.debug("sendRequest")
 
 		status_code=0
-		waitTime=4
+		waitTime=10
 		tentativas=0
 
 		#Verificando se o status eh 200 OK para prosseguir com codigo
-		while(status_code!=200 and tentativas<3):
+		while(status_code!=200):
 
 			try:
 				response = requests.get(url=self.url+session+urlValue,headers=self.header )
@@ -197,10 +197,10 @@ class spotifyAPIConnection():
 
 		year=urllib.parse.quote(str(year))
 
-		searchValue='year:'+year
-
 		if genre!=None:
-			searchValue='genre:'+str(genre)
+			searchValue='genre:'+str(genre) + '+year:'+year
+		else:
+			searchValue='year:'+year
 
 		self.logger.debug("searchValue: "+ str(searchValue))
 
