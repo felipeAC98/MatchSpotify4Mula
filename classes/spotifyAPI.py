@@ -45,7 +45,7 @@ class spotifyAPIConnection():
 			'Authorization': 'Bearer {token}'.format(token=self.access_token)
 		}
 
-	def sendRequest(self, session, urlValue):
+	def sendRequest(self, session, urlValue=''):
 
 		self.logger.debug("sendRequest")
 
@@ -206,6 +206,25 @@ class spotifyAPIConnection():
 
 		return self.search(_type,searchValue,limit=limit, index=index)
 
+	def get_artist_top_tracks(self, artistID, market="BR"):
+
+		self.logger.debug("artist_top_tracks")
+
+		session='artists/'+str(artistID)+'/top-tracks?'
+
+		urlValue='market='+str(market)
+
+		return self.sendRequest(session,urlValue)
+
+	def get_album_tracks(self, albumID, limit=10):
+
+		self.logger.debug("get_album_tracks")
+
+		session='albums/'+str(albumID)+'/tracks?'
+
+		urlValue='limit='+str(limit)
+
+		return self.sendRequest(session,urlValue)
 
 class spotifyAPIConnectionTests():
 
@@ -225,6 +244,19 @@ class spotifyAPIConnectionTests():
 
 		print("Response: "+str(response))
 		print("test_get_type_by_year: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
+
+	def test_get_artist_top_tracks(self,artistID="0TnOYISbd1XYRBk9myaseg"):
+		response, respJson=self.spotifyConnection.get_artist_top_tracks(artistID=artistID)
+
+		print("Response: "+str(response))
+		print("test_get_album_tracks: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
+
+
+	def test_get_album_tracks(self,albumID="4aawyAB9vmqN3uQ7FjRGTy"):
+		response, respJson=self.spotifyConnection.get_album_tracks(albumID=albumID)
+
+		print("Response: "+str(response))
+		print("test_get_album_tracks: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
 
 class spotifyData():
 
@@ -246,7 +278,7 @@ class spotifyData():
 
 		return fieldnames
 
-	def get_track_features(self,trackID,genre=None):
+	def get_track_features(self,trackID,genre=None,artDict=None):
 
 		self.logger.debug("get_track_features: trackID: "+str(trackID))
 
@@ -261,6 +293,13 @@ class spotifyData():
 		self.logger.debug("release_date: "+str(features["release_date"]))
 		
 		artistID=respJson['artists'][0]["id"]
+
+		if artDict==None:
+			#Obtendo total de seguidores do spotify
+			response, respJson=self.spotifyConnection.get_artistInfo(artistID)
+			features['totalFollowers']=respJson['followers']['total']
+		else:
+			features['totalFollowers']=artDict['totalFollowers']
 
 		#Obtendo informacoes relacionadas com o audio de alto nivel da múusica
 		_spotifyBasicAudioFeature=['danceability','energy','key','mode','speechiness','loudness','acousticness','instrumentalness','liveness','valence','tempo','duration_ms','time_signature']
@@ -284,10 +323,6 @@ class spotifyData():
 		for key in respJson:
 			if key in _spotifyAudioAnalysis:
 				features[key]=len(respJson[key])'''
-
-		#Obtendo total de seguidores do spotify
-		response, respJson=self.spotifyConnection.get_artistInfo(artistID)
-		features['totalFollowers']=respJson['followers']['total']
 
 		#Obtendo o genero da musica
 		if genre==None:

@@ -4,8 +4,8 @@ import clientToken
 import csv
 import traceback
 import argparse
+import json
 
-trackRequestLimit=50
 fileName='spotifyDataset'
 
 def main():
@@ -13,23 +13,27 @@ def main():
 	#Obtencao dos parametros
 	parser = argparse.ArgumentParser(description='args')
 	parser.add_argument('--genre')						#caso queira se obter somente de um genero especifico
-	parser.add_argument('--nMusicsByYear')
+	parser.add_argument('--nAlbumsByYear')
 	parser.add_argument('--startYear')
 	parser.add_argument('--endYear')
 	parser.add_argument('--overwrite')
 	args = parser.parse_args()
 
 	genre=None
-	nMusicsByYear=1000
-	startYear=1970
+	nAlbumsByYear=500
+	startYear=1985
 	endYear=2023
 	openFileType='a'
+	artDict={}
+	trackRequestLimit=50
 
 	if args.genre != None:
 		genre=str(args.genre)
 
-	if args.nMusicsByYear != None:
-		nMusicsByYear=int(args.nMusicsByYear)
+	if args.nAlbumsByYear != None:
+		nAlbumsByYear=int(args.nAlbumsByYear)
+		if trackRequestLimit>nAlbumsByYear:
+			trackRequestLimit=nAlbumsByYear
 
 	if args.startYear != None:
 		startYear=int(args.startYear)
@@ -54,31 +58,45 @@ def main():
 
 		for year in range(startYear,endYear):
 
-			numberTracksByYear=int(nMusicsByYear*nTracksIncreasePercent)
+			#numberAlbumsByYear=int(nAlbumsByYear*nTracksIncreasePercent)
 			#nTracksIncreasePercent+=0.025 #aumentando em 2.5% o numero de musicas por ano
 			index=0
 
-			print("Year: "+str(year)+" numberTracksByYear: "+str(numberTracksByYear))
+			print("Year: "+str(year)+" nAlbumsByYear: "+str(nAlbumsByYear))
 
-			while(index<numberTracksByYear):
+			while(index<nAlbumsByYear):
 
-				response, respJson=_spotifyConnection.get_type_by_year(index=index,year=year,limit=trackRequestLimit,genre=genre)
+				response, albunsJson=_spotifyConnection.get_type_by_year( _type='album',index=index,year=year,limit=trackRequestLimit)
 
-				try:
+				for album in albunsJson['albums']['items']:
+					artistID=album['artists'][0]['id']
+					albumID=album['id']
 
-					for track in respJson['tracks']['items']:
+					if artistID in artDict.keys():
+						artPopularity=artDict[artistID]['artPopularity']
+					else:
+						response, artistJson=_spotifyConnection.get_artistInfo(artistID)
+						artPopularity=artistJson['popularity']
+						totalFollowers=artistJson['followers']['total']
+						artDict[artistID]={'artPopularity':artPopularity,'totalFollowers':totalFollowers}
 
-						trackID=track['id']
+					#Caso possua pouca popularidade nao sera utilizado
+					if artPopularity<20:
+						continue
 
-						features=_spotifyData.get_track_features(trackID,genre=genre)
+					response, albumJson=_spotifyConnection.get_album_tracks(albumID=albumID)
 
-						write.writerow(features)
+					try:
+						for track in albumJson['items']:
+							trackID=track['id']
+							features=_spotifyData.get_track_features(trackID,artDict=artDict[artistID])
+							write.writerow(features)
 
-				except:
-					print(' Erro obtendo track da resposta para o index: '+str(index)+ ' mensagem de erro: '+str(traceback.format_exc()))
-					break
+					except:
+						print(' Erro obtendo track da resposta para o index: '+str(index)+ ' mensagem de erro: '+str(traceback.format_exc()))
+						break
 
 				index+=trackRequestLimit
-
+			
 if __name__ == '__main__':
     sys.exit(main())
