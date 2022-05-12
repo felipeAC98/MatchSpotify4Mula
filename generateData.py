@@ -81,7 +81,7 @@ def main():
 						artDict[artistID]={'artPopularity':artPopularity,'totalFollowers':totalFollowers}
 
 					#Caso possua pouca popularidade nao sera utilizado
-					if artPopularity<20:
+					if artPopularity<15:
 						continue
 
 					response, albumJson=_spotifyConnection.get_album_tracks(albumID=albumID)
