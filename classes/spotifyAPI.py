@@ -54,16 +54,19 @@ class spotifyAPIConnection():
 		tentativas=0
 
 		#Verificando se o status eh 200 OK para prosseguir com codigo
-		while(status_code!=200):
+		while(status_code!=200 and tentativas<3):
 
 			try:
 				response = requests.get(url=self.url+session+urlValue,headers=self.header )
 				status_code=response.status_code
-
 				if status_code!=200:
-					sleep(waitTime)
 					self.logger.debug(" request fail:"+ str(response))
 					print(response)
+					if status_code == 429:
+						print("Aguardando por: "+str(response.headers['retry-after']))
+						sleep(int(response.headers['retry-after']))
+					else:
+						sleep(waitTime)
 					self.access_token=self.getToken()
 					self.updateHeader()
 

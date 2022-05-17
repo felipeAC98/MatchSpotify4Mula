@@ -5,6 +5,7 @@ import csv
 import traceback
 import argparse
 import json
+from time import sleep as sleep
 
 fileName='spotifyDataset'
 
@@ -54,7 +55,7 @@ def main():
 		#Obtendo o nome dos parametros apartir de uma trackID exemplo
 		fieldnames=_spotifyData.get_field_names()
 
-		write = csv.DictWriter(csvFile, delimiter=',', lineterminator='\n',fieldnames=fieldnames)
+		write = csv.DictWriter(csvFile, delimiter='|', lineterminator='\n',fieldnames=fieldnames)
 
 		for year in range(startYear,endYear):
 
@@ -88,13 +89,14 @@ def main():
 
 					try:
 						for track in albumJson['items']:
+							sleep(1)
 							trackID=track['id']
 							features=_spotifyData.get_track_features(trackID,artDict=artDict[artistID])
 							write.writerow(features)
 
 					except:
 						print(' Erro obtendo track da resposta para o index: '+str(index)+ ' mensagem de erro: '+str(traceback.format_exc()))
-						break
+						#break
 
 				index+=trackRequestLimit
 			
