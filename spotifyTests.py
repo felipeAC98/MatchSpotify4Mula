@@ -8,7 +8,9 @@ spotifyConnectionTests=spotifyAPIConnectionTests()
 
 #spotifyConnectionTests.test_get_type_by_year()
 
-spotifyConnectionTests.test_get_album_tracks()
+#spotifyConnectionTests.test_get_album_tracks()
+
+spotifyConnectionTests.test_get_user_top_items()
 
 #Spotify data tests
 
