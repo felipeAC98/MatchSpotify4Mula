@@ -72,6 +72,7 @@ class spotifyAPIConnection():
 		while(status_code!=200 and tentativas<3):
 
 			try:
+				self.logger.debug("request:"+ str(session+urlValue))
 				response = requests.get(url=self.url+session+urlValue,headers=self.header )
 				status_code=response.status_code
 				if status_code!=200:
@@ -207,6 +208,9 @@ class spotifyAPIConnection():
 
 				genres.append(genre)
 
+		if genres==None:
+			genres=["unknown"]
+
 		return genres
 
 	def get_type_by_year(self, _type='track',genre=None, index=1,year=2020,limit=10):
@@ -305,7 +309,7 @@ class spotifyData():
 
 		self.logger=logger.setup_logger("spotifyData")
 
-	def get_field_names(self):
+	def get_track_field_names(self):
 		fieldnames=[]
 
 		#Obtendo o nome dos parametros apartir de uma trackID exemplo

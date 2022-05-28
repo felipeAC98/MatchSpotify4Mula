@@ -53,7 +53,7 @@ def main():
 	with open(fileName+'.csv', openFileType) as csvFile:
 
 		#Obtendo o nome dos parametros apartir de uma trackID exemplo
-		fieldnames=_spotifyData.get_field_names()
+		fieldnames=_spotifyData.get_track_field_names()
 
 		write = csv.DictWriter(csvFile, delimiter='|', lineterminator='\n',fieldnames=fieldnames)
 
