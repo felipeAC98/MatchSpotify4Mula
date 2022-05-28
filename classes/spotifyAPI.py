@@ -15,7 +15,7 @@ class spotifyAPIConnection():
 		self.clientID=clientID
 		self.clientSecret=clientSecret
 
-		self.access_token=self.get_auth_code_flow()
+		self.access_token=self.getToken()
 		
 		self.header={
 			'Authorization': 'Bearer {token}'.format(token=self.access_token)
@@ -47,14 +47,11 @@ class spotifyAPIConnection():
 		from spotipy.oauth2 import SpotifyOAuth
 
 		scope = "user-top-read"
-		
 		sp_oauth = SpotifyOAuth( self.clientID, self.clientSecret,'http://localhost:8888/',scope=scope)
-		token_info = sp_oauth.get_cached_token()
-		#sp = spotipy.Spotify(token_info['access_token'])
 
 		sp = spotipy.Spotify(auth_manager=sp_oauth)
-		#sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
-		results = sp.current_user_top_artists()
+		results = sp.current_user_top_artists()			#trigando a autenticacao web
+		token_info = sp_oauth.get_cached_token()
 
 		return token_info['access_token']
 
@@ -75,7 +72,6 @@ class spotifyAPIConnection():
 		while(status_code!=200 and tentativas<3):
 
 			try:
-				print(self.url+session+urlValue)
 				response = requests.get(url=self.url+session+urlValue,headers=self.header )
 				status_code=response.status_code
 				if status_code!=200:
@@ -86,12 +82,8 @@ class spotifyAPIConnection():
 						sleep(int(response.headers['retry-after']))
 					else:
 						sleep(waitTime)
-					
-					if status_code ==403:
-						self.access_token=self.get_auth_code_flow()
-					else:
-						self.access_token=self.getToken()
-						self.updateHeader()
+
+					self.updateHeader()
 
 			except:
 				self.logger.warning(' erro sendRequest: '+str(traceback.format_exc()))
@@ -256,12 +248,12 @@ class spotifyAPIConnection():
 
 		self.logger.debug("get_user_top_items")
 
-		session='me/top/'+str(_type)+''
+		session='me/top/'+str(_type)+'?'
 
-		urlValue=''#'time_range='+str(time_range)+'&limit='+str(limit)+'&offset='+str(index)
+		urlValue='time_range='+str(time_range)+'&limit='+str(limit)+'&offset='+str(index)
 		
-		print(session)
-		print(urlValue)
+		self.access_token=self.get_auth_code_flow()
+		self.updateHeader()
 		return self.sendRequest(session,urlValue)
 
 class spotifyAPIConnectionTests():
@@ -296,8 +288,8 @@ class spotifyAPIConnectionTests():
 		print("Response: "+str(response))
 		print("test_get_album_tracks: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
 
-	def test_get_user_top_items(self,_type="artists"):
-		response, respJson=self.spotifyConnection.get_user_top_items(_type=_type)
+	def test_get_user_top_items(self,_type="tracks"):
+		response, respJson=self.spotifyConnection.get_user_top_items(_type=_type,limit=1)
 
 		print("Response: "+str(response))
 		print("test_get_user_top_items: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
