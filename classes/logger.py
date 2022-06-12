@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+import os
 
 def setup_logger(name, level=logging.DEBUG):
     """To setup as many loggers as you want"""
@@ -13,8 +14,12 @@ def setup_logger(name, level=logging.DEBUG):
     log_file="logs/"+name+".log"
 
     formatter = logging.Formatter('%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
-
-    handler = logging.FileHandler(log_file)        
+    try:
+        handler = logging.FileHandler(log_file)        
+    except:
+        os.makedirs("logs/")
+        handler = logging.FileHandler(log_file)     
+        
     handler.setFormatter(formatter)
 
     logger = logging.getLogger(name)
