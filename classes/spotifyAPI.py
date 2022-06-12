@@ -260,44 +260,6 @@ class spotifyAPIConnection():
 		self.updateHeader()
 		return self.sendRequest(session,urlValue)
 
-class spotifyAPIConnectionTests():
-
-	def __init__(self):
-		self.spotifyConnection=spotifyAPIConnection(clientToken.CLIENT_ID, clientToken.CLIENT_SECRET)
-
-
-	def test_genre(self):
-		response, respJson=self.spotifyConnection.trackSearch("Starlight","Muse")
-		trackID=respJson['tracks']['items'][0]['id']
-
-		print("Response: "+str(response))
-		print("Generos obtidos: "+str(self.spotifyConnection.get_genres(trackID)))
-
-	def test_get_type_by_year(self,year=2010,limit=1):
-		response, respJson=self.spotifyConnection.get_type_by_year(_type='track',index=2,year=year,limit=limit)
-
-		print("Response: "+str(response))
-		print("test_get_type_by_year: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
-
-	def test_get_artist_top_tracks(self,artistID="0TnOYISbd1XYRBk9myaseg"):
-		response, respJson=self.spotifyConnection.get_artist_top_tracks(artistID=artistID)
-
-		print("Response: "+str(response))
-		print("test_get_album_tracks: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
-
-
-	def test_get_album_tracks(self,albumID="4aawyAB9vmqN3uQ7FjRGTy"):
-		response, respJson=self.spotifyConnection.get_album_tracks(albumID=albumID)
-
-		print("Response: "+str(response))
-		print("test_get_album_tracks: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
-
-	def test_get_user_top_items(self,_type="tracks"):
-		response, respJson=self.spotifyConnection.get_user_top_items(_type=_type,limit=1)
-
-		print("Response: "+str(response))
-		print("test_get_user_top_items: "+str(json.dumps(respJson, indent=4, sort_keys=True)))
-
 class spotifyData():
 
 	def __init__(self,_spotifyConnection=None):
