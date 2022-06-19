@@ -7,8 +7,6 @@ import argparse
 import json
 from time import sleep as sleep
 
-fileName='spotifyDataset'
-
 def main():
 
 	#Obtencao dos parametros
@@ -18,6 +16,7 @@ def main():
 	parser.add_argument('--startYear')
 	parser.add_argument('--endYear')
 	parser.add_argument('--overwrite')
+	parser.add_argument('--filename')
 	args = parser.parse_args()
 
 	genre=None
@@ -27,6 +26,11 @@ def main():
 	openFileType='a'
 	artDict={}
 	trackRequestLimit=50
+
+	if args.filename != None:
+		fileName=str(args.filename)
+	else:
+		fileName='spotifyDataset'
 
 	if args.genre != None:
 		genre=str(args.genre)
@@ -67,7 +71,7 @@ def main():
 
 			while(index<nAlbumsByYear):
 
-				response, albunsJson=_spotifyConnection.get_type_by_year( _type='album',index=index,year=year,limit=trackRequestLimit)
+				response, albunsJson=_spotifyConnection.get_type_by_year( _type='album',index=index,year=year,limit=trackRequestLimit,genre=genre)
 
 				for album in albunsJson['albums']['items']:
 					artistID=album['artists'][0]['id']
